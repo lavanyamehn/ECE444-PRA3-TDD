@@ -75,7 +75,7 @@ def delete_entry(post_id):
     """Deletes post from database."""
     result = {'status': 0, 'message': 'Error'}
     try:
-        db.session.query(models.Post).filter_by(id=post_id).delete()
+        db.session.query(Post).filter_by(id=post_id).delete()
         db.session.commit()
         result = {'status': 1, 'message': "Post Deleted"}
         flash('The entry was deleted.')
