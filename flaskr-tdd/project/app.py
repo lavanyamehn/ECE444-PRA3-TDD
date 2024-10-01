@@ -24,13 +24,13 @@ app.config.from_object(__name__)
 db = SQLAlchemy(app)
 db.app = app
 
-from project import models
+from .models import Post
 
 
 @app.route('/')
 def index():
     """Searches the database for entries, then displays them."""
-    entries = db.session.query(models.Post)
+    entries = db.session.query(Post)
     return render_template('index.html', entries=entries)
 
 
@@ -39,7 +39,7 @@ def add_entry():
     """Adds new post to the database."""
     if not session.get('logged_in'):
         abort(401)
-    new_entry = models.Post(request.form['title'], request.form['text'])
+    new_entry = Post(request.form['title'], request.form['text'])
     db.session.add(new_entry)
     db.session.commit()
     flash('New entry was successfully posted')
