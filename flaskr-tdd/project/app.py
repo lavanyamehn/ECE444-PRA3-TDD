@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 from flask import Flask, g, render_template, request, session, \
@@ -13,9 +14,13 @@ DATABASE = "flaskr.db"
 USERNAME = "admin"
 PASSWORD = "admin"
 SECRET_KEY = "a_random_key"
-SQLALCHEMY_DATABASE_URI = f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
-SQLALCHEMY_TRACK_MODIFICATIONS = False
+url = os.getenv('DATABASE_URL', f'sqlite:///{Path(basedir).joinpath(DATABASE)}')
 
+if url.startswith("postgres://"):
+    url = url.replace("postgres://", "postgresql://", 1)
+
+SQLALCHEMY_DATABASE_URI = url
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # create and initialize a new Flask app
 app = Flask(__name__)
@@ -102,5 +107,10 @@ def search():
         return render_template('search.html', entries=entries, query=query)
     return render_template('search.html')
 
+# Fixes the issue when tests are run and pass, the db becomes empty and the
+# flask app is unable to run.
+import create_db
+
 if __name__ == "__main__":
+
     app.run()
