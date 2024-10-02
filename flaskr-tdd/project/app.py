@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 
 from flask import Flask, g, render_template, request, session, \
@@ -109,6 +110,10 @@ def search():
 
 # Fixes the issue when tests are run and pass, the db becomes empty and the
 # flask app is unable to run.
+current = Path(__file__).resolve().parent
+parent = os.path.dirname(current)
+sys.path.append(parent)
+
 import create_db
 
 if __name__ == "__main__":
