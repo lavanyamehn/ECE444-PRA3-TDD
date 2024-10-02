@@ -79,3 +79,38 @@ def test_delete_message(client):
     rv = client.get('/delete/1')
     data = json.loads(rv.data)
     assert data["status"] == 1
+
+def test_search_message(client):
+    """Ensure only the searched message is visible"""
+    login(client, app.config["USERNAME"], app.config["PASSWORD"])
+    messages = [
+        ("Hello", "How are you?"),
+        ("Test", "This is a test message"),
+        ("Hello", "Two messages test")
+    ]
+    for message in messages:
+        # post messages on the website
+        resp = client.post(
+            "/add",
+            data=dict(title=message[0], text=message[1]),
+            follow_redirects=True,
+        )
+        assert bytes(message[1], 'utf-8') in resp.data
+
+    # search for the Test message
+    rv = client.get(
+        "/search/",
+        query_string=dict(query="Test"),
+        follow_redirects=True,
+    )
+    assert rv.status_code == 200
+    assert b"This is a test message" in rv.data
+
+    # search for the 2 Hello messages
+    rv = client.get(
+        "/search/",
+        query_string=dict(query="Hello"),
+        follow_redirects=True,
+    )
+    assert rv.status_code == 200
+    assert bytes(messages[0][1], 'utf-8') in rv.data and bytes(messages[2][1], 'utf-8') in rv.data
