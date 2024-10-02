@@ -1,4 +1,3 @@
-import os
 import pytest
 import json
 from pathlib import Path
@@ -6,6 +5,7 @@ from pathlib import Path
 from project.app import app, db
 
 TEST_DB = "test.db"
+
 
 @pytest.fixture
 def client():
@@ -18,6 +18,7 @@ def client():
         db.create_all()  # setup
         yield app.test_client()  # tests run here
         db.drop_all()  # teardown
+
 
 def login(client, username, password):
     """Login helper function"""
@@ -74,6 +75,7 @@ def test_messages(client):
     assert b"&lt;Hello&gt;" in rv.data
     assert b"<strong>HTML</strong> allowed here" in rv.data
 
+
 def test_delete_message(client):
     """Ensure the messages are being deleted"""
     rv = client.get("/delete/1")
@@ -83,6 +85,7 @@ def test_delete_message(client):
     rv = client.get("/delete/1")
     data = json.loads(rv.data)
     assert data["status"] == 1
+
 
 def test_delete_requires_login(client):
     """Ensure only logged in members can delete messages"""
@@ -95,13 +98,14 @@ def test_delete_requires_login(client):
     data = json.loads(rv.data)
     assert data["status"] == 1
 
+
 def test_search_message(client):
     """Ensure only the searched message is visible"""
     login(client, app.config["USERNAME"], app.config["PASSWORD"])
     messages = [
         ("Hello", "How are you?"),
         ("Test", "This is a test message"),
-        ("Hello", "Two messages test")
+        ("Hello", "Two messages test"),
     ]
     for message in messages:
         # post messages on the website
@@ -110,7 +114,7 @@ def test_search_message(client):
             data=dict(title=message[0], text=message[1]),
             follow_redirects=True,
         )
-        assert bytes(message[1], 'utf-8') in resp.data
+        assert bytes(message[1], "utf-8") in resp.data
 
     # search for the Test message
     rv = client.get(
@@ -128,4 +132,5 @@ def test_search_message(client):
         follow_redirects=True,
     )
     assert rv.status_code == 200
-    assert bytes(messages[0][1], 'utf-8') in rv.data and bytes(messages[2][1], 'utf-8') in rv.data
+    assert (bytes(messages[0][1], "utf-8") in rv.data)
+    assert (bytes(messages[2][1], "utf-8") in rv.data)
