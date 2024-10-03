@@ -132,5 +132,5 @@ def test_search_message(client):
         follow_redirects=True,
     )
     assert rv.status_code == 200
-    assert (bytes(messages[0][1], "utf-8") in rv.data)
-    assert (bytes(messages[2][1], "utf-8") in rv.data)
+    assert bytes(messages[0][1], "utf-8") in rv.data
+    assert bytes(messages[2][1], "utf-8") in rv.data
